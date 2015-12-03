@@ -1,0 +1,18 @@
+{
+	"name" : "Benichou34/blocknetreviews",
+	"description" : "Prestashop module to display Verified Reviews Widget",
+	"homepage" : "https://github.com/Benichou34/blocknetreviews",
+	"license" : "MIT",
+	"require" : {
+		"php" : ">=5.4"
+	},
+	"config" : {
+		"preferred-install" : "dist"
+	},
+	"type" : "prestashop-module",
+	"authors" : [{
+			"email" : "benichou.software@gmail.com",
+			"name" : "Benichou"
+		}
+	]
+}
