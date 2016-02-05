@@ -2,7 +2,7 @@
 /*
 * The MIT License (MIT)
 *
-* Copyright (c) 2015 Benichou
+* Copyright (c) 2016 Benichou
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 * SOFTWARE.
 *
 *  @author    Benichou <benichou.software@gmail.com>
-*  @copyright 2015 Benichou
+*  @copyright 2016 Benichou
 *  @license   http://opensource.org/licenses/MIT  The MIT License (MIT)
 */
 
@@ -38,7 +38,8 @@ class BlockNetReviews extends Module
 		$this->name = 'blocknetreviews';
 		$this->tab = 'advertising_marketing';
 		$this->author = 'Benichou';
-		$this->version = '1.0';
+		$this->version = '1.1';
+		$this->allow_push = false;
 
 		parent::__construct();
 		$this->displayName = $this->l('Verified Reviews Block');
@@ -49,6 +50,8 @@ class BlockNetReviews extends Module
 	public function install()
 	{
 		if (!parent::install()
+			|| !$this->registerHook('dashboardZoneOne')
+			|| !$this->registerHook('dashboardData')
 			|| !$this->registerHook('displayFooter')
 			|| !$this->registerHook('displayRightColumn')
 			|| !$this->registerHook('displayLeftColumn'))
@@ -59,6 +62,8 @@ class BlockNetReviews extends Module
 
 	public function uninstall()
 	{
+		$this->unregisterHook('dashboardZoneOne');
+		$this->unregisterHook('dashboardData');
 		$this->unregisterHook('displayFooter');
 		$this->unregisterHook('displayRightColumn');
 		$this->unregisterHook('displayLeftColumn');
@@ -225,5 +230,28 @@ class BlockNetReviews extends Module
 	public function hookRightColumn($params)
 	{
 		return $this->hookLeftColumn($params);
+	}
+
+	public function hookDashboardZoneOne($params)
+	{
+		$this->context->smarty->assign(array(
+			'av_block_reviews_url' => Configuration::get('AV_BLOCK_REVIEWS_URL')
+		));
+
+		return $this->display(__FILE__, 'views/templates/hook/dashboard_zone_one.tpl');
+	}
+
+	public function hookDashboardData($params)
+	{
+		if (Tools::getValue('extra') == 'update')
+			$this->upateShopRating($this->context->shop->id);
+
+		return array(
+			'data_value' => array(
+				'rating' => Configuration::get('AV_BLOCK_RATING')."/5",
+				'reviews' => Configuration::get('AV_BLOCK_REVIEWS'),
+				'update' => date("Y-m-d H:i:s", Configuration::get('AV_BLOCK_LAST_UPDATE'))
+			)
+		);
 	}
 }
